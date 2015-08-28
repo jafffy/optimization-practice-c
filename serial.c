@@ -11,9 +11,9 @@
 #define min(a,b) ((a)<(b)?(a):(b))
 #define PI_POWERED M_PI*M_PI
 
-void axmb(const int m, const int n, double uu[], double ww[], const double xg[], const double yg[]){
+void axmb(const int m, const int n, double uu[], double ww[], const double xg_diff, const double yg_diff, const double xcos[], const double ycos[]){
 	int i,j;
-	const double hh = xg[1] - xg[0], hh2 = hh*hh;
+	const double hh = xg_diff, hh2 = hh*hh;
 	memset(ww, 0, sizeof(ww));
 
 	for(i=1;i<m-1;i++){
@@ -21,19 +21,13 @@ void axmb(const int m, const int n, double uu[], double ww[], const double xg[],
 			ww[j+n*i] += (-2.L*uu[j+n*i]+uu[j+n*(i-1)] + uu[j+n*(i+1)])/hh2;
 		}
 	}
-	const double hh_2 = yg[1] - yg[0], hh2_2 = hh_2*hh_2;
+	const double hh_2 = yg_diff, hh2_2 = hh_2*hh_2;
 	for(i=1;i<m-1;i++){
 		for(j=1;j<n-1;j++){
 			ww[j+n*i] += (-2.L*uu[j+n*i]+uu[j-1+n*i] + uu[j+1+n*i])/hh2_2;
 		}
 	}
-	double xcos[m], ycos[n];
-	for (i = 0; i < m; ++i) {
-		xcos[i] = cos(M_PI*xg[i]);
-	}
-	for (i = 0; i < n; ++i) {
-		ycos[i] = cos(M_PI*yg[i]);
-	}
+	
 	for(i=0;i<m;i++){
 		for(j=0;j<n;j++){
 			ww[j+n*i] -= (-2.l*PI_POWERED*xcos[i]*ycos[j]);
@@ -57,19 +51,27 @@ int main(int argc, char **argv){
 
 	double xg[m];
 	double yg[n];
+	double xcos[m];
+	double ycos[n];
 	double uu[m*n];
 	double vv[m*n];
 	double ww[m*n];
 
 	for(i=0;i<m;i++) xg[i] = (1.L)/(double)(m-1)*(double)(i);
 	for(j=0;j<n;j++) yg[j] = (1.L)/(double)(n-1)*(double)(j);
+	for (i = 0; i < m; ++i) {
+		xcos[i] = cos(M_PI*xg[i]);
+	}
+	for (i = 0; i < n; ++i) {
+		ycos[i] = cos(M_PI*yg[i]);
+	}
 
 	const double hh = xg[1] - xg[0];
 	const double hh2 = hh * hh;
 	memset(uu, 0, sizeof(uu));
 	vndb(m,n,uu);
 	memcpy(vv, uu, sizeof(vv));
-	miter = 10;
+	miter = 50;
 
 	double ww_[m*n];
 	for (unsigned int i = 0; i < m*n; ++i) {
@@ -78,7 +80,7 @@ int main(int argc, char **argv){
 
 	for(iter=1;iter<=miter;iter++){
 		vndb(m,n,uu);
-		axmb(m,n,uu,ww,xg,yg);
+		axmb(m,n,uu,ww,xg[1]-xg[0],yg[1]-yg[0],xcos,ycos);
 		vndb(m,n,ww);
 		for(i=1;i<m-1;i++){
 			for(j=1;j<n-1;j++){
