@@ -1,3 +1,5 @@
+#define _GNU_SOURCE
+
 #include<stdio.h>
 #include<stdlib.h>
 #include<stddef.h>
@@ -7,7 +9,7 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
 
-void axmb(int m, int n, double *const uu, double *const ww, double *const xg, double *const yg){
+void axmb(int m, int n, double uu[], double ww[], const double xg[], const double yg[]){
 	int i,j;
 	double pi, hh, hh2;
 	hh = xg[1] - xg[0]; hh2 = hh*hh;
@@ -31,7 +33,7 @@ void axmb(int m, int n, double *const uu, double *const ww, double *const xg, do
 		}
 	}
 }
-inline void vndb(int m, int n, double *const uu){
+inline void vndb(const int m, const int n, double uu[]){
 	int i,j;
 	for(j=0;j<n;j++) uu[j] = uu[j+1*n];
 	for(j=0;j<n;j++) uu[j+n*(m-1)] = uu[j+n*(m-2)];
@@ -39,24 +41,18 @@ inline void vndb(int m, int n, double *const uu){
 	for(i=0;i<m;i++) uu[n-1+n*i] = uu[n-2+n*i];
 }
 
+#define m 1000
+#define n 1000
 
 int main(int argc, char **argv){
-	// double *uu, *vv, *ww;
-	// double *xg, *yg;
 	int i,j,k,miter,iter;
 	double pi, test0, hh,hh2;
 
-	int m,n;
-
-	n = m = 1000;
-
-	double * const big_chunk = (double*)malloc(sizeof(double)*(n+m+3*m*n));
-
-	double * const xg = big_chunk; // (double*)malloc(sizeof(double)*m);
-	double * const yg = big_chunk + m; // (double*)malloc(sizeof(double)*n);
-	double * const uu = big_chunk + m + n; // (double*)malloc(sizeof(double)*m*n);
-	double * const vv = big_chunk + m + n + m * n; // (double*)malloc(sizeof(double)*m*n);
-	double * const ww = big_chunk + m + n + m * n * 2; // (double*)malloc(sizeof(double)*m*n);
+	double xg[m];
+	double yg[n];
+	double uu[m*n];
+	double vv[m*n];
+	double ww[m*n];
 
 
 	for(i=0;i<m;i++) xg[i] = 0.L + (1.L-0.L)/(double)(m-1)*(double)(i);
@@ -106,12 +102,4 @@ int main(int argc, char **argv){
 		fprintf(wp,"\n");
 	}
 	fprintf(wp,"\n");
-	/*
-	free(xg);
-	free(yg);
-	free(uu);
-	free(ww);
-	free(vv);
-	*/
-	free(big_chunk);
 }
