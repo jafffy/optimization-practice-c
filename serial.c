@@ -31,7 +31,7 @@ void axmb(int m, int n, double *uu, double *ww, double *xg, double *yg){
 		}
 	}
 }
-void vndb(int m, int n, double *uu){
+inline void vndb(int m, int n, double *uu){
 	int i,j;
 	for(j=0;j<n;j++) uu[j] = uu[j+1*n];
 	for(j=0;j<n;j++) uu[j+n*(m-1)] = uu[j+n*(m-2)];
@@ -49,11 +49,14 @@ int main(int argc, char **argv){
 	int m,n;
 
 	n = m = 1000;
-	xg = (double*)malloc(sizeof(double)*m);
-	yg = (double*)malloc(sizeof(double)*n);
-	uu = (double*)malloc(sizeof(double)*m*n);
-	vv = (double*)malloc(sizeof(double)*m*n);
-	ww = (double*)malloc(sizeof(double)*m*n);
+
+	double *big_chunk = (double*)malloc(sizeof(double)*(n+m+3*m*n));
+
+	xg = big_chunk; // (double*)malloc(sizeof(double)*m);
+	yg = big_chunk + m; // (double*)malloc(sizeof(double)*n);
+	uu = big_chunk + m + n; // (double*)malloc(sizeof(double)*m*n);
+	vv = big_chunk + m + n + m * n; // (double*)malloc(sizeof(double)*m*n);
+	ww = big_chunk + m + n + m * n * 2; // (double*)malloc(sizeof(double)*m*n);
 
 
 	for(i=0;i<m;i++) xg[i] = 0.L + (1.L-0.L)/(double)(m-1)*(double)(i);
@@ -103,9 +106,12 @@ int main(int argc, char **argv){
 		fprintf(wp,"\n");
 	}
 	fprintf(wp,"\n");
+	/*
 	free(xg);
 	free(yg);
 	free(uu);
 	free(ww);
 	free(vv);
+	*/
+	free(big_chunk);
 }
