@@ -3,4 +3,4 @@ all:
 low-version:
 	mpicc serial.c -o serial -lm -O3
 check:
-	sh ./check.sh
+	bash ./check.sh
