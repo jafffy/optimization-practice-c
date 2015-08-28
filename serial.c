@@ -7,7 +7,7 @@
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
 
-void axmb(int m, int n, double *uu, double *ww, double *xg, double *yg){
+void axmb(int m, int n, double *const uu, double *const ww, double *const xg, double *const yg){
 	int i,j;
 	double pi, hh, hh2;
 	hh = xg[1] - xg[0]; hh2 = hh*hh;
@@ -31,7 +31,7 @@ void axmb(int m, int n, double *uu, double *ww, double *xg, double *yg){
 		}
 	}
 }
-inline void vndb(int m, int n, double *uu){
+inline void vndb(int m, int n, double *const uu){
 	int i,j;
 	for(j=0;j<n;j++) uu[j] = uu[j+1*n];
 	for(j=0;j<n;j++) uu[j+n*(m-1)] = uu[j+n*(m-2)];
@@ -41,8 +41,8 @@ inline void vndb(int m, int n, double *uu){
 
 
 int main(int argc, char **argv){
-	double *uu, *vv, *ww;
-	double *xg, *yg;
+	// double *uu, *vv, *ww;
+	// double *xg, *yg;
 	int i,j,k,miter,iter;
 	double pi, test0, hh,hh2;
 
@@ -50,13 +50,13 @@ int main(int argc, char **argv){
 
 	n = m = 1000;
 
-	double *big_chunk = (double*)malloc(sizeof(double)*(n+m+3*m*n));
+	double * const big_chunk = (double*)malloc(sizeof(double)*(n+m+3*m*n));
 
-	xg = big_chunk; // (double*)malloc(sizeof(double)*m);
-	yg = big_chunk + m; // (double*)malloc(sizeof(double)*n);
-	uu = big_chunk + m + n; // (double*)malloc(sizeof(double)*m*n);
-	vv = big_chunk + m + n + m * n; // (double*)malloc(sizeof(double)*m*n);
-	ww = big_chunk + m + n + m * n * 2; // (double*)malloc(sizeof(double)*m*n);
+	double * const xg = big_chunk; // (double*)malloc(sizeof(double)*m);
+	double * const yg = big_chunk + m; // (double*)malloc(sizeof(double)*n);
+	double * const uu = big_chunk + m + n; // (double*)malloc(sizeof(double)*m*n);
+	double * const vv = big_chunk + m + n + m * n; // (double*)malloc(sizeof(double)*m*n);
+	double * const ww = big_chunk + m + n + m * n * 2; // (double*)malloc(sizeof(double)*m*n);
 
 
 	for(i=0;i<m;i++) xg[i] = 0.L + (1.L-0.L)/(double)(m-1)*(double)(i);
@@ -98,7 +98,7 @@ int main(int argc, char **argv){
 
 	printf("%24.15g %24.15g\n",uu[0],uu[m-1]);
 	printf("%24.15g %24.15g\n",uu[n-1],uu[n-1+n*(m-1)]);
-	FILE *wp = fopen("fort.11", "w");
+	FILE *const wp = fopen("fort.11", "w");
 	for(i=0;i<m;i++){
 		for(j=0;j<n;j++){
 			fprintf(wp,"%g %g %g\n",xg[i],yg[i],uu[j+n*i]);
