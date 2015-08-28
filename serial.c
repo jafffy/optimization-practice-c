@@ -3,17 +3,18 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<stddef.h>
+#include <memory.h>
 #include<math.h>
 #include<float.h>
 
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
 
-void axmb(int m, int n, double uu[], double ww[], const double xg[], const double yg[]){
+void axmb(const int m, const int n, double uu[], double ww[], const double xg[], const double yg[]){
 	int i,j;
 	double pi, hh, hh2;
 	hh = xg[1] - xg[0]; hh2 = hh*hh;
-	for(i=0;i<m*n;i++) ww[i] = 0.L;
+	memset(ww, 0, sizeof(ww));
 
 	for(i=1;i<m-1;i++){
 		for(j=0;j<n;j++){
@@ -55,18 +56,16 @@ int main(int argc, char **argv){
 	double ww[m*n];
 
 
-	for(i=0;i<m;i++) xg[i] = 0.L + (1.L-0.L)/(double)(m-1)*(double)(i);
-	for(j=0;j<n;j++) yg[j] = 0.L + (1.L-0.L)/(double)(n-1)*(double)(j);
+	for(i=0;i<m;i++) xg[i] = (1.L)/(double)(m-1)*(double)(i);
+	for(j=0;j<n;j++) yg[j] = (1.L)/(double)(n-1)*(double)(j);
 
 
 	pi = M_PI;
 	hh = xg[1] - xg[0];
 	hh2 = hh * hh;
-	for(i=0;i<m*n;i++) uu[i] = 0.l;
+	memset(uu, 0, sizeof(uu));
 	vndb(m,n,uu);
-	for(i=0;i<m*n;i++) vv[i] = uu[i];
-	miter = 1000000000;
-	miter = 10000;
+	memcpy(vv, uu, sizeof(vv));
 	miter = 10;
 
 	for(iter=1;iter<=miter;iter++){
@@ -85,9 +84,8 @@ int main(int argc, char **argv){
 			amax = max(fabs(uu[i])+1.E-8L,amax);
 		}
 		test0 = test0/amax;
-		for(i=0;i<m*n;i++){
-			vv[i] = uu[i];
-		}
+		memcpy(vv, uu, sizeof(vv));
+		
 		if((iter%1000) == 1 || iter < 1000) printf("%d %24.15e\n",iter, test0);
 		if(test0<1.E-6L ) break;
 	}
