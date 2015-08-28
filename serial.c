@@ -9,11 +9,11 @@
 
 #define max(a,b) ((a)>(b)?(a):(b))
 #define min(a,b) ((a)<(b)?(a):(b))
+#define PI_POWERED M_PI*M_PI
 
 void axmb(const int m, const int n, double uu[], double ww[], const double xg[], const double yg[]){
 	int i,j;
-	double pi, hh, hh2;
-	hh = xg[1] - xg[0]; hh2 = hh*hh;
+	const double hh = xg[1] - xg[0], hh2 = hh*hh;
 	memset(ww, 0, sizeof(ww));
 
 	for(i=1;i<m-1;i++){
@@ -21,16 +21,22 @@ void axmb(const int m, const int n, double uu[], double ww[], const double xg[],
 			ww[j+n*i] += (-2.L*uu[j+n*i]+uu[j+n*(i-1)] + uu[j+n*(i+1)])/hh2;
 		}
 	}
-	hh = yg[1] - yg[0]; hh2 = hh*hh;
+	const double hh_2 = yg[1] - yg[0], hh2_2 = hh_2*hh_2;
 	for(i=1;i<m-1;i++){
 		for(j=1;j<n-1;j++){
-			ww[j+n*i] += (-2.L*uu[j+n*i]+uu[j-1+n*i] + uu[j+1+n*i])/hh2;
+			ww[j+n*i] += (-2.L*uu[j+n*i]+uu[j-1+n*i] + uu[j+1+n*i])/hh2_2;
 		}
 	}
-	pi = M_PI;
+	double xcos[m], ycos[n];
+	for (i = 0; i < m; ++i) {
+		xcos[i] = cos(M_PI*xg[i]);
+	}
+	for (i = 0; i < n; ++i) {
+		ycos[i] = cos(M_PI*yg[i]);
+	}
 	for(i=0;i<m;i++){
 		for(j=0;j<n;j++){
-			ww[j+n*i] -= (-2.l*pi*pi*cos(pi*xg[i])*cos(pi*yg[j]));
+			ww[j+n*i] -= (-2.l*PI_POWERED*xcos[i]*ycos[j]);
 		}
 	}
 }
@@ -47,7 +53,7 @@ inline void vndb(const int m, const int n, double uu[]){
 
 int main(int argc, char **argv){
 	int i,j,k,miter,iter;
-	double pi, test0, hh,hh2;
+	double test0;
 
 	double xg[m];
 	double yg[n];
@@ -55,18 +61,20 @@ int main(int argc, char **argv){
 	double vv[m*n];
 	double ww[m*n];
 
-
 	for(i=0;i<m;i++) xg[i] = (1.L)/(double)(m-1)*(double)(i);
 	for(j=0;j<n;j++) yg[j] = (1.L)/(double)(n-1)*(double)(j);
 
-
-	pi = M_PI;
-	hh = xg[1] - xg[0];
-	hh2 = hh * hh;
+	const double hh = xg[1] - xg[0];
+	const double hh2 = hh * hh;
 	memset(uu, 0, sizeof(uu));
 	vndb(m,n,uu);
 	memcpy(vv, uu, sizeof(vv));
 	miter = 10;
+
+	double ww_[m*n];
+	for (unsigned int i = 0; i < m*n; ++i) {
+		ww_[i] = ww_[i]*(hh2/4.L)*0.9L;
+	}
 
 	for(iter=1;iter<=miter;iter++){
 		vndb(m,n,uu);
@@ -79,9 +87,11 @@ int main(int argc, char **argv){
 		}
 		test0 = -DBL_MAX;
 		double amax = -DBL_MAX;
+		for (i=0;i<m*n;++i) {
+			amax = max(fabs(uu[i])+1.E-8L,amax);
+		}
 		for(i=0;i<m*n;i++){
 			test0 = max(fabs(vv[i]-uu[i]),test0);
-			amax = max(fabs(uu[i])+1.E-8L,amax);
 		}
 		test0 = test0/amax;
 		memcpy(vv, uu, sizeof(vv));
